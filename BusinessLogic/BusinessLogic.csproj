@@ -51,6 +51,11 @@
   <ItemGroup>
     <Compile Include="DataManager.cs" />
     <Compile Include="DbDataContext.cs" />
+    <Compile Include="Migrations\201610271158346_Initial.cs" />
+    <Compile Include="Migrations\201610271158346_Initial.Designer.cs">
+      <DependentUpon>201610271158346_Initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\Implementations\CoinRepository.cs" />
     <Compile Include="Repositories\Implementations\DrinkRepository.cs" />
@@ -66,6 +71,11 @@
       <Project>{1EBC98ED-88C8-4752-A96B-8BBCE03262A8}</Project>
       <Name>Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201610271158346_Initial.resx">
+      <DependentUpon>201610271158346_Initial.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
