@@ -33,6 +33,14 @@ namespace Web.Models.EnityModels
 
     public class DrinkModel : IModel
     {
+        public DrinkModel() { }
+        public DrinkModel(Drink drink)
+        {
+            Id = drink.Id;
+            Name = drink.Name;
+            Cost = drink.Cost;
+        }
+
         public string Url { get; set; }
         /// <summary>
         /// Cretae Url for Post/Put return
@@ -48,5 +56,6 @@ namespace Web.Models.EnityModels
         public string Name { get; set; }
         public int Number { get; set; }
         public int Cost { get; set; }
+        public string ErrorMessage { get; set; }
     }
 }
