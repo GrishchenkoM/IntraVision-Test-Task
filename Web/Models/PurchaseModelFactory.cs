@@ -350,6 +350,35 @@ namespace Web.Models
 
         #endregion
 
+        public List<CoinModel> Create(int[] list)
+        {
+            var dict = new Dictionary<int, int>();
+            foreach (var coin in list)
+            {
+                try
+                {
+                    dict[coin]++;
+                }
+                catch (Exception)
+                {
+                    dict.Add(coin, 1);
+                }
+            }
+            var coinModel = new List<CoinModel>();
+            foreach (var record in dict)
+            {
+                var coin = _dataManager.Coins.Get().FirstOrDefault(x => x.Name.Equals(record.Key.ToString()));
+                if (coin != null)
+                    coinModel.Add(new CoinModel()
+                    {
+                        Id = coin.Id,
+                        Name = coin.Name,
+                        Number = record.Value
+                    });
+            }
+            return coinModel;
+        }
+
         private readonly DataManager _dataManager;
     }
 }

@@ -13,5 +13,70 @@
 input,
 select,
 textarea {
-    max-width: 280px;
+    max-width: 80px;
+}
+
+.jumbotron ul.hr {
+    margin: 0; /* Обнуляем значение отступов */
+    padding: 4px; /* Значение полей */
+   }
+
+.jumbotron li {
+    list-style-type: none;
+}
+.jumbotron ul li {
+    display: inline; /* Отображать как строчный элемент */
+    margin-right: 80px; /* Отступ слева */   /* ------ определить размер в зависимости от кол-ва*/
+    padding: 3px; /* Поля вокруг текста */
+   }
+
+.coin input[type=button]{
+    width: 50px;
+    border-radius: 50px;
+}
+
+.disable_btn{
+    background: red;
+}
+
+#sum_fieldset {
+    width: 100px;
+    border: 1px solid #000;
+    background-color: #00ced1;
+}
+
+
+.product {
+    border: 1px solid;
+}
+
+.drink_btn_disable {
+    background: #778899;
+    color: #c0c0c0;
+}
+
+.view-category .browse-view .row{
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    margin-left: -15px;
+    margin-right: -15px;
+}
+.view-category .browse-view .row > .product{
+    border: 0;
+    margin-bottom: 20px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+}
+.view-category .browse-view .row .product > .spacer{
+    border: 1px solid #ddd;
 }

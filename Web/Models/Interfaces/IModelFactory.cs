@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Data;
 using System.Net.Http;
 using Core.Entities;
 
@@ -33,5 +34,6 @@ namespace Web.Models.Interfaces
 
         List<TModel1> Create(List<TEntity> list);
         TModel1 Create(TEntity entity);
+        List<TModel2> Create(int[] list);
     }
 }

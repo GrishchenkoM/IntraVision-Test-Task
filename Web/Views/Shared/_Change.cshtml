@@ -1,0 +1,36 @@
+﻿@using Web.Controllers
+@model List<Web.Models.EnityModels.CoinModel>
+@{ Layout = null;}
+
+<link href="~/Content/Site.css" rel="stylesheet"/>
+
+<div class="modal-content">
+    <div class="modal-header">
+        <h4>Take you purchase and change</h4>
+    </div>
+
+    <div class="modal-body">
+        <dl class="dl-horizontal" id="content">
+
+            <div class="jumbotron" id="coinsForChange">
+                @Html.DisplayCoins(Model)
+            </div>
+
+            <input type="button" id="closeChange_btn" value="Take" />
+        </dl>
+    </div>
+</div>
+
+<script src="~/Scripts/jquery-1.10.2.js"></script>
+<script src="~/Scripts/bootstrap.js"></script>
+<script src="~/Scripts/change.js"></script>
+<script>
+
+
+    $(document).ready(function() {
+        $("#closeChange_btn").bind("click", UpdateIndexContent);
+    });
+
+
+</script>
+

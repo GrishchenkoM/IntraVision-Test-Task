@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Web.Http;
 using BusinessLogic;
 using Web.Models.EnityModels;
@@ -13,8 +14,8 @@ namespace Web.Controllers
 
         public IHttpActionResult Get()
         {
-            var model = DataManager.Drinks.Get();
-            if (model != null)
+            var model = DataManager.Drinks.Get().Where(d => d.Number > 0);
+            if (model.Any())
                 return Ok(model);
 
             return NotFound();
