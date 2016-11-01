@@ -1,4 +1,4 @@
-﻿@using Web.Controllers
+﻿@using Web.Helpers
 @model List<Web.Models.EnityModels.CoinModel>
 @{ Layout = null;}
 
@@ -30,12 +30,10 @@
 <script src="~/Scripts/bootstrap.js"></script>
 <script src="~/Scripts/change.js"></script>
 <script>
-
-
+    
     $(document).ready(function() {
         $("#closeChange_btn").bind("click", UpdateIndexContent);
     });
-
-
+    
 </script>
 

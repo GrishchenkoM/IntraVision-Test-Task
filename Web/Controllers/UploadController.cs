@@ -87,7 +87,7 @@ namespace Web.Controllers
                     {
                         switch (reader.NodeType)
                         {
-                            case XmlNodeType.Element: // Узел является элементом.
+                            case XmlNodeType.Element:
                                 if (drinkTag.Any(tag => tag.Equals(reader.Name.ToLower())))
                                     drink = new Drink();
 
@@ -112,7 +112,7 @@ namespace Web.Controllers
                                     drink.Cost = Convert.ToInt32(reader.Value);
 
                                 break;
-                            case XmlNodeType.EndElement: // Вывести конец элемента.
+                            case XmlNodeType.EndElement:
                                 if (drinkTag.Any(tag => tag.Equals(reader.Name.ToLower())))
 
                                     drinksList.Add(drink);

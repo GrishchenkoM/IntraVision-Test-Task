@@ -2372,10 +2372,12 @@ input[type="button"].btn-block {
   opacity: 0;
   -webkit-transition: opacity 0.15s linear;
           transition: opacity 0.15s linear;
+    display: none;
 }
 
 .fade.in {
   opacity: 1;
+  display: block;
 }
 
 .collapse {
@@ -4957,7 +4959,7 @@ a.list-group-item.active > .badge,
   }
   .container .jumbotron {
     //padding-right: 60px;
-    padding-left: 60px;
+    padding-left: 160px;
   }
   .jumbotron h1 {
     font-size: 63px;

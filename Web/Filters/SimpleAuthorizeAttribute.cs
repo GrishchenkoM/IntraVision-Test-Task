@@ -13,8 +13,7 @@ namespace Web.Filters
 
             var key = queryString.Get(0);
 
-            //return key == password || base.AuthorizeCore(httpContext);
-            return true;
+            return key == password || base.AuthorizeCore(httpContext);
         }
     }
 }

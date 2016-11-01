@@ -89,7 +89,7 @@ function DeleteCoin() {
 function displayButton() {
     var name = $('#coinName').val().replace(new RegExp('\n', 'g'), '').replace(new RegExp(' ', 'g'), '');
     var number = $('#coinNumber').val().replace(new RegExp('\n', 'g'), '').replace(new RegExp(' ', 'g'), '');
-    //var authorNameInput = $('#authorNameInput').val().replace(new RegExp('\n', 'g'), '').replace(new RegExp(' ', 'g'), '');
+
     if (name !== '' && number !== '') {
         for (var i = 0; i < currentBtns.length; ++i) {
             $('#coinResult').text('');
@@ -103,47 +103,13 @@ function displayButton() {
     }
 }
 
-// request for info about the authors - GET -------------------- !!
-function getAuthors() {
-    $.ajax({
-        url: '/api/coin',
-        type: 'GET',
-        dataType: 'json',
-        success: function(data) {
-            var sel = document.getElementById('authorNameSelect');
-            var opt = null;
-
-            for (var i = -1; i < data.length; ++i) {
-                opt = document.createElement('option');
-                if (i == -1) {
-                    opt.value = '';
-                    opt.id = i;
-                    opt.innerHTML = '';
-                } else {
-                    opt.value = data[i].Name;
-                    opt.id = data[i].Id;
-                    opt.innerHTML = data[i].Name;
-                }
-                sel.appendChild(opt);
-            }
-        },
-        error: function(data) {
-            $('#bookResult').css("display", "block");
-            $('#bookResult').append(data.responseText);
-        }
-    });
-}
-
 // request for coin list - GET
 function getCoin(model) {
-    echo(model);
     $.ajax({
         url: '/api/coin/' + model,
         type: 'GET',
-        //data: { index: model },
         dataType: 'json',
         success: function(data) {
-            echo(data);
             $('#coinId').val(data.Id);
             $('#coinName').val(data.Name);
             $('#coinNumber').val(data.Number);
@@ -157,15 +123,6 @@ function getCoin(model) {
         }
     });
 }
-
-//// AuthorName TextBox filling of selected in the ComboBox
-//function setAuthorNameTextBoxFromComboBox() {
-//    var select = document.getElementById("authorNameSelect");
-//    select.addEventListener("click",function () {
-//        $('#authorNameInput').val($('#authorNameSelect').val());
-//        displayButton();
-//    }, false);
-//}
 
 // subscription to change Author Name TextBox
 function changeCoinNameTextBox() {
@@ -185,8 +142,4 @@ function btnEvents() {
     $("#createCoinBtn").bind("click", CreateCoin);
     $("#updateCoinBtn").bind("click", UpdateCoin);
     $("#deleteCoinBtn").bind("click", DeleteCoin);
-}
-
-function echo(data) {
-    console.log(data);
 }

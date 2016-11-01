@@ -178,6 +178,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Files\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -218,10 +219,12 @@
     <Compile Include="Controllers\CoinController.cs" />
     <Compile Include="Controllers\DrinkController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\UploadController.cs" />
     <Compile Include="Filters\SimpleAuthorizeAttribute.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\MyHelpers.cs" />
     <Compile Include="Models\EnityModels\CoinModelFactory.cs" />
     <Compile Include="Models\EnityModels\DrinkModelFactory.cs" />
     <Compile Include="Models\Interfaces\IModelFactory.cs" />

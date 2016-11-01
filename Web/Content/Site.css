@@ -13,7 +13,7 @@
 input,
 select,
 textarea {
-    max-width: 80px;
+    max-width: 380px;
 }
 
 .jumbotron ul.hr {
@@ -53,6 +53,14 @@ textarea {
 .drink_btn_disable {
     background: #778899;
     color: #c0c0c0;
+}
+
+#coinTab, #drinkTab {
+    cursor: pointer;
+}
+
+thead {
+   background: silver; 
 }
 
 .view-category .browse-view .row{

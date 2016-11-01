@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
 using BusinessLogic;
 using Core.Entities;
 using Web.Models.EnityModels;
@@ -64,6 +63,34 @@ namespace Web.Models
         {
             return new DrinkModel(entity);
         }
+        public List<CoinModel> Create(int[] list)
+        {
+            var dict = new Dictionary<int, int>();
+            foreach (var coin in list)
+            {
+                try
+                {
+                    dict[coin]++;
+                }
+                catch (Exception)
+                {
+                    dict.Add(coin, 1);
+                }
+            }
+            var coinModel = new List<CoinModel>();
+            foreach (var record in dict)
+            {
+                var coin = _dataManager.Coins.Get().FirstOrDefault(x => x.Name.Equals(record.Key.ToString()));
+                if (coin != null)
+                    coinModel.Add(new CoinModel()
+                    {
+                        Id = coin.Id,
+                        Name = coin.Name,
+                        Number = record.Value
+                    });
+            }
+            return coinModel;
+        }
 
         /// <summary>
         /// Define some needed info
@@ -119,17 +146,11 @@ namespace Web.Models
         {
             foreach (var newCoin in tempCoinsList)
             {
-                try
-                {
-                    newCoin.Number -= numberOfCoinsForChange[newCoin.Id];
-                }
-                catch
-                {
-                    newCoin.Id = -1;
-                }
-            }
+                var key = Convert.ToInt32(newCoin.Name);
 
-            tempCoinsList.RemoveAll(x => x.Id == -1);
+                if (numberOfCoinsForChange.ContainsKey(key))
+                    newCoin.Number -= numberOfCoinsForChange[key];
+            }
         }
 
         /// <summary>
@@ -367,35 +388,7 @@ namespace Web.Models
         }
 
         #endregion
-
-        public List<CoinModel> Create(int[] list)
-        {
-            var dict = new Dictionary<int, int>();
-            foreach (var coin in list)
-            {
-                try
-                {
-                    dict[coin]++;
-                }
-                catch (Exception)
-                {
-                    dict.Add(coin, 1);
-                }
-            }
-            var coinModel = new List<CoinModel>();
-            foreach (var record in dict)
-            {
-                var coin = _dataManager.Coins.Get().FirstOrDefault(x => x.Name.Equals(record.Key.ToString()));
-                if (coin != null)
-                    coinModel.Add(new CoinModel()
-                    {
-                        Id = coin.Id,
-                        Name = coin.Name,
-                        Number = record.Value
-                    });
-            }
-            return coinModel;
-        }
+        
 
         private readonly DataManager _dataManager;
     }

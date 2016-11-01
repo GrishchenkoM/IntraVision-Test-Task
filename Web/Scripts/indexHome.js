@@ -11,11 +11,6 @@ function Update() {
             dataType: "json",
             success: function (data) {
                 displayCoins(data);
-                //var div = $("#bookPageLinks");
-                //div.empty();
-                //if (data.PageInfo.TotalItems > data.PageInfo.PageSize)
-                //    CreateBookPageLinks(data.PageInfo);
-                //pageLinksStyle();
             },
             error: function (data) {
                 var div = $("#Coins");
@@ -33,11 +28,6 @@ function Update() {
         dataType: "json",
         success: function (data) {
             displayDrinks(data);
-            //var div = $("#authorPageLinks");
-            //div.empty();
-            //if (data.PageInfo.TotalItems > data.PageInfo.PageSize)
-            //    CreateAuthorPageLinks(data.PageInfo);
-            //pageLinksStyle();
         },
         error: function (data) {
             var div = $("#Drinks");
@@ -54,13 +44,10 @@ function displayCoins(data) {
     coins.empty();
 
     var ul = document.createElement("ul");
-    //ul.setAttribute("class", "table color_table");
-    //ul.setAttribute("id", "bookTab");
     ul.setAttribute("class", "coin");
 
     for (var i = 0; i < data.length; ++i) {
         var li = document.createElement("li");
-        //li.setAttribute("id", data.ContentModels[i].BookId);
         var btn = document.createElement("input");
         btn.setAttribute("type", "button");
         btn.setAttribute("class", "coin_btn");
@@ -110,9 +97,7 @@ function displayDrinks(data) {
         drink.appendChild(document.createElement("br"));
         drink.appendChild(document.createTextNode(data[i].Cost));
         drink.appendChild(document.createElement("br"));
-
         
-
         if (data[i].ErrorMessage !== undefined) {
             drink.appendChild(document.createTextNode(data[i].ErrorMessage));
             drink.appendChild(document.createElement("br"));
@@ -134,7 +119,6 @@ function displayDrinks(data) {
     $(".drink_btn").bind("click", MakePurchase);
 }
 
-// subscription buttons to events
 function btnEvents() {
     $("#cancel_btn").bind("click", ResetCoins);
 }
@@ -162,15 +146,12 @@ function TookCoin() {
     });
 }
 function MakePurchase() {
-    echo(event.target.id.split('_')[1]);
-    echo(event.target.value);
     var arr = GetCoinArray();
     $.ajax({
         url: "/home/MakePurchase/" + event.target.id.split('_')[1],
         type: "POST",
         data: { coins: arr },
         success: function (data) {
-            
             $("#changeContentDialog").html(data);
             $("#drinkName_lbl").val(event.target.value);
             $("#clientSum_lbl").val(GetSum());
@@ -188,8 +169,6 @@ function MakePurchase() {
 
 function EnableBuyButtons(data) {
     for (var i = 0; i < data.length; ++i) {
-        //$("#btn_" + data[i].Id).removeClass("drink_btn_disable");
-        //$("#btn_" + data[i].Id).addClass("drink_btn");
         $("#btn_" + data[i].Id).css("display", "block");
         $("#btn_" + data[i].Id).removeAttr("disabled");
 
@@ -197,17 +176,11 @@ function EnableBuyButtons(data) {
             $("#drink_" + data[i].Id).append(document.createTextNode(data[i].ErrorMessage));
     }
 }
-
 function ResetCoins() {
     ResetCoinsSum();
     ResetCoinArray();
     $(".row input[type=button]").attr("disabled", "disabled");
     $("#sum_lable").text("");
-}
-
-
-function echo(data) {
-    console.log(data);
 }
 
 function makeSumCounter() {
@@ -216,7 +189,6 @@ function makeSumCounter() {
     this.ResetCoinsSum = function () { sum = 0; }
     this.GetSum = function () { return sum; }
 }
-
 function makeCoinArray() {
     var arr = [];
     
@@ -227,10 +199,8 @@ function makeCoinArray() {
 
 //Hide Modal view -> update content
 function UpdateIndexContent() {
-    echo("before hide");
     $("#modDialog_Change").modal("hide");
     ResetCoins();
-    echo("after hide");
     try {
         $(function () {
             Update();

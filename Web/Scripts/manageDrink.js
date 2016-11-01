@@ -92,7 +92,6 @@ function displayButton() {
     var cost = $('#drinkCost').val().replace(new RegExp('\n', 'g'), '').replace(new RegExp(' ', 'g'), '');
     if (name !== '' && number !== '' && cost !== '') {
         for (var i = 0; i < currentBtns.length; ++i) {
-            //$('#drinkResult').css("display", "none");
             $(currentBtns[i]).css("display", "block");
         }
     } else {
@@ -108,7 +107,6 @@ function getDrink(model) {
     $.ajax({
         url: '/api/drink/' + model,
         type: 'GET',
-        //data: { index: model },
         dataType: 'json',
         success: function(data) {
             $('#drinkId').val(data.Id);
@@ -136,7 +134,6 @@ function changeDrinkNameTextBox() {
 // subscription to change the content of a modal window
 function keyUpDisplBtnForModalViewContent() {
     $('#content').keyup(function() { displayButton(); });
-    //$('#drinkName').keyup(function() { displayButton(); });
 }
 
 // subscription buttons to events
