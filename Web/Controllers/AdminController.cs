@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.IO;
 using System.Web.Mvc;
 using Web.Filters;
 
 namespace Web.Controllers
 {
-    [SimpleAuthorize]
+    
     public class AdminController : Controller
     {
-        // GET: Admin
+        [SimpleAuthorize]
         public ActionResult Index()
         {
             return View();
@@ -30,6 +27,21 @@ namespace Web.Controllers
                 return View("_ManageDrink", index);
 
             return View("_ManageDrink", -1);
+        }
+
+        [HttpPost]
+        public JsonResult Upload(string value)
+        {
+            foreach (string file in Request.Files)
+            {
+                var upload = Request.Files[file];
+                if (upload != null)
+                {
+                    var fileName = Path.GetFileName(upload.FileName);
+                    upload.SaveAs(Server.MapPath("~/Files/" + fileName));
+                }
+            }
+            return Json("Done!");
         }
     }
 }

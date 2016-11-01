@@ -1,0 +1,46 @@
+<drinks>
+	<drink>
+		<name>
+			First Drink
+		</name>
+		<number>
+			100
+		</number>
+		<cost>
+			50
+		</cost>
+	</drink>
+	<drink>
+		<name>
+			Second Drink
+		</name>
+		<number>
+			99
+		</number>
+		<cost>
+			49
+		</cost>
+	</drink>
+	<drink>
+		<name>
+			Third Drink
+		</name>
+		<number>
+			98
+		</number>
+		<cost>
+			48
+		</cost>
+	</drink>
+	<drink>
+		<name>
+			Fourth Drink
+		</name>
+		<number>
+			97
+		</number>
+		<cost>
+			47
+		</cost>
+	</drink>
+</drinks>

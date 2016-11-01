@@ -8,7 +8,9 @@
     <br/>
 
     <div>
-        <input type="file" value="Import XLS"/>
+        <input type="file" name="upload" id="upload_btn" value="Import XLS"/>
+        <br/>
+        <input type="submit" id="upload_submit" value="Upload XLS"/>
     </div>
 
     <br />
@@ -82,7 +84,7 @@
 <script src="~/Scripts/jquery-1.10.2.js"></script>
 <script src="~/Scripts/indexAdmin.js"></script>
 <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
 
         Update();
         btnEvents();
@@ -90,4 +92,46 @@
         $('#createCoin').css("margin-bottom", "20px");
         $('#createDrink').css("margin-bottom", "20px");
     });
+
+    $('#upload_submit').on('click', function(e) {
+        e.preventDefault();
+        var files = document.getElementById('upload_btn').files;
+        if (files.length > 0) {
+            if (window.FormData !== undefined) {
+                var data = new FormData();
+                for (var x = 0; x < files.length; x++) {
+                    data.append("file" + x, files[x]);
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: 'api/upload/post',
+                    contentType: false,
+                    processData: false,
+                    data: data,
+                    success: function (result) {
+                        console.log("upladed");
+                        $(function () {
+                            $.ajax({
+                                url: 'api/upload/ReadImportFile',
+                                type: "GET",
+                                success: function (data) {
+                                    Update();
+                                },
+                                error: function(data) {
+                                    alert(data);
+                                }
+                            });
+                        });
+                    },
+                    error: function(xhr, status, p3) {
+                        alert(status);
+                    }
+                });
+            } else {
+                alert("Browser does not support uploading of HTML5 files!");
+            }
+        }
+    });
+    
 </script>
