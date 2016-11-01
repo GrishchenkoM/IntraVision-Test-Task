@@ -26,7 +26,8 @@ namespace Web.Models.EnityModels
             {
                 Id = model.Id,
                 Name = model.Name,
-                Number = model.Number
+                Number = model.Number,
+                Cost = model.Cost
             };
         }
     }

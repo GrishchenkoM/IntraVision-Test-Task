@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using BusinessLogic;
 using Core.Entities;
 using Web.Models.EnityModels;
@@ -167,7 +168,8 @@ namespace Web.Models
 
                 if (!isHaveChange)
                 {
-                    drink.ErrorMessage = "Available only without change!";
+                    drink.ErrorMessage = "No change! Available only without change!";
+                    //drink.ErrorMessage = "No change!";
                 }
             }
         }
@@ -184,87 +186,103 @@ namespace Web.Models
         private static bool DefineNumberOfCoinsForChange(
             ref Dictionary<int, int> coinsForChangeNumberDictionary, int sum, List<int> coinsValueList, List<CoinModel> newCoinsList, DrinkModel drinks)
         {
+            var isHaveChange = false;
             var change = sum - drinks.Cost;
 
             FillDictionaryOfCoinsForChange(
                 coinsValueList, change, coinsForChangeNumberDictionary);
 
-            var isHaveChange = true;
-            var neededRest = 0; //остаток нехватки определенных монет
-            foreach (var coinValue in coinsValueList)
+            if (coinsForChangeNumberDictionary.Count == 0)
+                return true;
+
+            for (var i = 0; i < coinsValueList.Count; ++i)
             {
-                try
+                if (coinsForChangeNumberDictionary.ContainsKey(coinsValueList[i]))
                 {
-                    DefineIsHaveChange(ref isHaveChange, ref neededRest,
-                        ref coinsForChangeNumberDictionary, coinValue, newCoinsList);
-                }
-                catch (Exception)
-                {
-                    // ignored
+                    var coin = newCoinsList.FirstOrDefault(c =>
+                        c.Name.Equals(coinsValueList[i].ToString()) && c.Number > 0);
+
+                    var neededCoinsForChange = coinsForChangeNumberDictionary[coinsValueList[i]];
+
+                    if (coin != null)
+                    {
+                        var neededCoinsNumber = neededCoinsForChange - coin.Number;
+                        if (neededCoinsNumber > 0)
+                        {
+                            coinsForChangeNumberDictionary[coinsValueList[i]] = coin.Number;
+
+                            Repeat(ref coinsForChangeNumberDictionary, ref isHaveChange,
+                                        coinsValueList, coinsValueList[i], neededCoinsNumber);
+                        }
+                        else
+                            isHaveChange = true;
+                    }
+                    else
+                    {
+                        var neededCoinsNumber = neededCoinsForChange;
+
+                        coinsForChangeNumberDictionary.Remove(coinsValueList[i]);
+
+                        Repeat(ref coinsForChangeNumberDictionary, ref isHaveChange,
+                                        coinsValueList, coinsValueList[i], neededCoinsNumber);
+                    }
                 }
             }
+            if (coinsForChangeNumberDictionary.Count == 0)
+                isHaveChange = false;
+
             return isHaveChange;
         }
 
-        /// <summary>
-        /// Define the change for current drinks
-        /// </summary>
-        /// <param name="isHaveChange"></param>
-        /// <param name="neededRest">It's a value of missing coins</param>
-        /// <param name="coinsForChangeNumberDictionary">Dictionary of needed coins for change</param>
-        /// <param name="coinValue">Coin value from list of coins value sorted in descending</param>
-        /// <param name="newCoinsList">List of coins with new coins from Client</param>
-        private static void DefineIsHaveChange(ref bool isHaveChange, ref int neededRest,
-            ref Dictionary<int, int> coinsForChangeNumberDictionary,
-            int coinValue, List<CoinModel> newCoinsList)
+        private static void Repeat(
+            ref Dictionary<int, int> coinsForChangeNumberDictionary, ref bool isHaveChange, 
+            List<int> coinsValueList, int coinValue, int neededCoinsNumber)
         {
-            var coinsForChangeNumber = -1;
-            try
+            var newValue = coinValue / 2;
+            if(newValue == 0)
+                return;
+            
+            if (coinsValueList.Contains(newValue) && coinValue != 3)
             {
-                coinsForChangeNumber = coinsForChangeNumberDictionary[coinValue];
-            }
-            catch
-            {
-                if (coinsForChangeNumber == -1 && isHaveChange)
-                    throw;
-            }
-            if (coinsForChangeNumber != -1 || isHaveChange == false)
-            {
-                var coin = newCoinsList.FirstOrDefault(c => c.Name.Equals(coinValue.ToString())
-                                                            && c.Number > 0);
-                int neededrest;
-                if (coinsForChangeNumber == -1 && coin != null)
-                {
-                    neededrest = neededRest;
-                    coinsForChangeNumberDictionary.Add(coin.Id, neededRest);
-                }
+                if (coinsForChangeNumberDictionary.ContainsKey(newValue))
+                    coinsForChangeNumberDictionary[newValue] += 2 * neededCoinsNumber;
                 else
-                    neededrest = coinsForChangeNumber * coinValue + neededRest;
+                    coinsForChangeNumberDictionary.Add(newValue, 2 * neededCoinsNumber);
 
-                if (coin != null && coin.Number * coinValue <= neededrest)
-                    // если не хватает определенных монет для сдачи, ищем необх. кол-во монет низшей масти
-                {
-                    isHaveChange = false;
-                    neededRest += neededrest - coin.Number * coinValue;
-                    coinsForChangeNumberDictionary[coinValue] = coin.Number;
-                }
-                else if (coin == null)
-                {
-                    isHaveChange = false;
+                isHaveChange = true;
+            }
+            else
+            {
+                var newCoinsValueList = coinsValueList.Where(x => x < coinValue).OrderByDescending(c => c).ToList();
 
-                    if (coinsForChangeNumber != -1)
+                for (var j = 0; j < newCoinsValueList.Count; ++j)
+                {
+                    var nextCoin = newCoinsValueList[j];
+                    if (newValue / nextCoin > 0)
                     {
-                        neededRest += neededrest;
-                        coinsForChangeNumberDictionary.Remove(coinValue);
+                        if (coinsForChangeNumberDictionary.ContainsKey(nextCoin))
+                        {
+                            coinsForChangeNumberDictionary[nextCoin] += neededCoinsNumber;
+                            newValue = newValue - nextCoin;
+
+                            if (coinsValueList.Contains(newValue))
+                                if (coinsForChangeNumberDictionary.ContainsKey(newValue))
+                                {
+                                    coinsForChangeNumberDictionary[newValue] += neededCoinsNumber;
+                                    isHaveChange = true;
+                                }
+                                else
+                                {
+                                    Repeat(ref coinsForChangeNumberDictionary, ref isHaveChange, 
+                                        coinsValueList, newValue, neededCoinsNumber);
+                                }
+                        }
                     }
-                }
-                else
-                {
-                    isHaveChange = true;
+
                 }
             }
         }
-
+        
         /// <summary>
         /// Create dictionary of needed coins for change
         /// </summary>

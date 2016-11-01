@@ -1,0 +1,70 @@
+﻿@{ Layout = null;}
+
+<div class="modal-content">
+    <div class="modal-header">
+        <button class="close" data-dismiss="modal" area-hidden="true">X</button>
+        <h4>Manage Drink</h4>
+    </div>
+    <div class="modal-body">
+        <dl class="dl-horizontal" id="content">
+
+            <dt>Drink Name</dt>
+            <dd><fieldset><input type="text" id="drinkName" name="sql" pattern="^[a-zA-ZА-Яа-яЁё\s]+$" required /></fieldset></dd>
+
+            <dd><br/></dd>
+
+            <dt>Drink Number</dt>
+            <dd><fieldset><input type="text" id="drinkNumber" name="sql" pattern="[0-9]{4}" maxlength="3" required /></fieldset></dd>
+
+            <dd><br/></dd>
+
+            <dt>Drink Cost</dt>
+            <dd><fieldset><input type="text" id="drinkCost" name="sql" pattern="[0-9]{4}" maxlength="3" required /></fieldset></dd>
+
+            <dd><br /></dd>
+
+            <dd><input type="text" id="drinkId" style="display: none" /></dd>
+            <dd><br/></dd>
+
+            <dd><input type="submit" id="createDrinkBtn" value="Create Drink" style="display: none" /></dd>
+            <dd>
+                <input type="submit" id="updateDrinkBtn" value="Update Drink" style="display: none" />
+                &nbsp;
+                <input type="submit" id="deleteDrinkBtn" value="Delete Drink" style="display: none" />
+            </dd>
+
+
+            <dd><fieldset><br /><textarea id="drinkResult" style="width: 300px; display: none" disabled="disabled" ></textarea></fieldset></dd>
+
+        </dl>
+    </div>
+</div>
+
+<script src="~/Scripts/manageDrink.js"></script>
+<script>
+    
+    // display content
+    function getContent() {
+        var model = @Model;
+        if (model != -1) {
+            getDrink(model);
+        } else {
+            currentBtns = ["#createDrinkBtn"];
+        }
+    }
+    
+    $(document).ready(function() {
+
+        keyUpDisplBtnForModalViewContent();
+        displayButton();
+        getContent();
+        changeDrinkNameTextBox();
+        btnEvents();
+
+    });
+
+</script>
+
+
+
+

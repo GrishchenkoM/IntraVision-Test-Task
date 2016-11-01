@@ -27,7 +27,7 @@ namespace BusinessLogic.Repositories.Implementations
             _context.Set<T>().Add(obj);
             _context.SaveChanges();
 
-            return _context.Set<T>().Find(obj);
+            return _context.Set<T>().Find(obj.Id);
         }
 
         public T Update(T obj)

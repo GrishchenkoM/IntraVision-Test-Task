@@ -1,0 +1,93 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<br /><br />
+<div class="row">
+
+    <br/>
+
+    <div>
+        <input type="file" value="Import XLS"/>
+    </div>
+
+    <br />
+
+    @CreateNavTabs()
+
+    <br/>
+
+    @*Coin Nav Tab*@
+    <div class="tab-pane fade active in" id="coinTable">
+
+        <div class="col-md-1">
+            @*Create Coin Button*@
+            <input type="submit" id="createCoin" value="New Coin"/>
+        </div>
+
+        <div class="col-md-8">
+
+            @*Table*@
+            <div id="myTabContent1" class="tab-content">
+
+                <div id="Coins"></div>
+
+                @* create modal view *@
+                <div id="modCoinDialog" class="modal fade">
+                    <div id="dialogCoinContent" class="modal-dialog"></div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    @*Drink Nav Tab*@
+    <div class="tab-pane fade" id="drinkTable">
+
+        <div class="col-md-2">
+            @*Create Drink Button*@
+            <input type="submit" id="createDrink" value="New Drink"/>
+        </div>
+
+        <div class="col-md-10">
+
+            @*Table*@
+            <div id="myTabContent" class="tab-content">
+
+                <div id="Drinks"></div>
+
+                @* create modal view *@
+                <div id="modDrinkDialog" class="modal fade">
+                    <div id="dialogDrinkContent" class="modal-dialog"></div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+@helper CreateNavTabs()
+{
+    <ul id="myTab" class="nav nav-tabs">
+        <li class="active"><a href="#coinTable" data-toggle="tab">Coins</a></li>
+        <li class=""><a href="#drinkTable" data-toggle="tab">Drinks</a></li>
+    </ul>
+}
+
+<script src="~/Scripts/jquery-1.10.2.js"></script>
+<script src="~/Scripts/indexAdmin.js"></script>
+<script>
+    $(document).ready(function () {
+
+        Update();
+        btnEvents();
+
+        $('#createCoin').css("margin-bottom", "20px");
+        $('#createDrink').css("margin-bottom", "20px");
+    });
+</script>

@@ -1,0 +1,72 @@
+﻿@{ Layout = null;}
+
+
+<div class="modal-content">
+    <div class="modal-header">
+        <button class="close" data-dismiss="modal" area-hidden="true">X</button>
+        <h4>Manage Coin</h4>
+    </div>
+    <div class="modal-body">
+        <dl class="dl-horizontal" id="content">
+
+            <dt>Name of Coin</dt>
+            <dd><fieldset><input type="text" id="coinName" name="sql" pattern="[0-9]{4}" maxlength="3" required/></fieldset></dd>
+
+            <dd><br /></dd>
+
+            <dt>Number</dt>
+            <dd><input type="text" id="coinNumber" pattern="[0-9]{4}" maxlength="3" required/></dd>
+
+            <dd><br/></dd>
+
+            <dt>IsAvailable</dt>
+            <dd><select id="isAvailableSelect">
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select></dd>
+
+            <dd><input type="text" id="coinId" style="display: none"/></dd>
+            <dd><br /></dd>
+
+            <dd><input type="submit" id="createCoinBtn" value="Create Coin" style="display: none" /></dd>
+            <dd>
+                <input type="submit" id="updateCoinBtn" value="Update Coin" style="display: none"/>
+                &nbsp;
+                <input type="submit" id="deleteCoinBtn" value="Delete Coin" style="display: none" />
+            </dd>
+
+
+            <dd><fieldset><br/><textarea id="coinResult" style="width: 300px; display: none" disabled="disabled"></textarea></fieldset></dd>
+
+        </dl>
+    </div>
+</div>
+
+<script src="~/Scripts/manageCoin.js"></script>
+<script>
+    
+    // display content
+    function getContent() {
+        var model = @Model;
+        if (model != -1) {
+            getCoin(model);
+        } else {
+            //getAuthors();
+            currentBtns = ["#createCoinBtn"];
+            $('#coinResult').css("display", "block");
+            $('#coinResult').append("Create button will be enabled when all fields will be filled");
+        }
+    }
+
+    $(document).ready(function() {
+
+        keyUpDisplBtnForModalViewContent();
+        displayButton();
+        getContent();
+        //setAuthorNameTextBoxFromComboBox();
+        changeCoinNameTextBox();
+        btnEvents();
+
+    });
+
+</script>
