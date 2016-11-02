@@ -232,7 +232,7 @@ namespace Web.Models
                         {
                             coinsForChangeNumberDictionary[coinsValueList[i]] = coin.Number;
 
-                            Repeat(ref coinsForChangeNumberDictionary, ref isHaveChange,
+                            FindOtherCoins(ref coinsForChangeNumberDictionary, ref isHaveChange,
                                         coinsValueList, coinsValueList[i], neededCoinsNumber);
                         }
                         else
@@ -244,7 +244,7 @@ namespace Web.Models
 
                         coinsForChangeNumberDictionary.Remove(coinsValueList[i]);
 
-                        Repeat(ref coinsForChangeNumberDictionary, ref isHaveChange,
+                        FindOtherCoins(ref coinsForChangeNumberDictionary, ref isHaveChange,
                                         coinsValueList, coinsValueList[i], neededCoinsNumber);
                     }
                 }
@@ -255,7 +255,7 @@ namespace Web.Models
             return isHaveChange;
         }
 
-        private static void Repeat(
+        private static void FindOtherCoins(
             ref Dictionary<int, int> coinsForChangeNumberDictionary, ref bool isHaveChange, 
             List<int> coinsValueList, int coinValue, int neededCoinsNumber)
         {
@@ -294,7 +294,7 @@ namespace Web.Models
                                 }
                                 else
                                 {
-                                    Repeat(ref coinsForChangeNumberDictionary, ref isHaveChange, 
+                                    FindOtherCoins(ref coinsForChangeNumberDictionary, ref isHaveChange, 
                                         coinsValueList, newValue, neededCoinsNumber);
                                 }
                         }
