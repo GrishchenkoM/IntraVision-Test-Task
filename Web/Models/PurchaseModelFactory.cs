@@ -18,28 +18,26 @@ namespace Web.Models
 
         public List<DrinkModel> Create(List<CoinModel> list)
         {
-            List<int> coinsValueList;
             List<CoinModel> newCoinsList;
             int sum;
 
-            CoinsServiceSetUp(list, out newCoinsList, out coinsValueList, out sum);
+            CoinsServiceSetUp(list, out newCoinsList, out sum);
 
             var drinks = _dataManager.Drinks.Get()
                     .Where(d => d.Cost <= sum && d.Number > 0).ToList();
 
             var drinkModel = Create(drinks);
 
-            DefinePresenceOfChange(drinkModel, sum, coinsValueList, newCoinsList);
+            DefinePresenceOfChange(drinkModel, sum, newCoinsList);
 
             return drinkModel;
         }
         public List<CoinModel> Create(List<CoinModel> list, int id)
         {
-            List<int> coinsValueList;
-            List<CoinModel> tempCoinsList;
+            List<CoinModel> newCoinsList;
             int sum;
 
-            CoinsServiceSetUp(list, out tempCoinsList, out coinsValueList, out sum);
+            CoinsServiceSetUp(list, out newCoinsList, out sum);
             
             var drink = _dataManager.Drinks.Get(id);
             drink.Number--;
@@ -47,11 +45,11 @@ namespace Web.Models
 
             var drinkModel = Create(drink);
 
-            var numberOfCoinsForChange = DefineChange(sum, coinsValueList, tempCoinsList, drinkModel);
+            var numberOfCoinsForChange = DefineChange(sum, newCoinsList, drinkModel);
 
-            UpdateTempCoinsList(tempCoinsList, numberOfCoinsForChange);
+            UpdateTempCoinsList(newCoinsList, numberOfCoinsForChange);
 
-            UpdateCoinsDatabase(tempCoinsList);
+            UpdateCoinsDatabase(newCoinsList);
 
             return CreateModelOfChange(numberOfCoinsForChange); 
         }
@@ -100,22 +98,23 @@ namespace Web.Models
         /// <param name="coinsValueList">List of values of coins</param>
         /// <param name="sum">Amount of client's money</param>
         protected void CoinsServiceSetUp(
-            List<CoinModel> list, out List<CoinModel> newCoinsList,
-            out List<int> coinsValueList, out int sum)
+            List<CoinModel> list, out List<CoinModel> newCoinsList, out int sum)
         {
             var coins = _dataManager.Coins.Get().ToList();
-            coinsValueList = CreateCoinsValueList(coins);
+
             sum = Sum(coins, list);
+
             newCoinsList = CreateNewCoinsList(coins, list);
+            newCoinsList.Reverse();
         }
 
         /// <summary>
         /// Update Coins in Database
         /// </summary>
-        /// <param name="tempCoinsList">Temporary list od coins</param>
-        protected void UpdateCoinsDatabase(List<CoinModel> tempCoinsList)
+        /// <param name="newCoinsList">Temporary list od coins</param>
+        protected void UpdateCoinsDatabase(List<CoinModel> newCoinsList)
         {
-            foreach (var newCoin in tempCoinsList)
+            foreach (var newCoin in newCoinsList)
             {
                 var coin = _dataManager.Coins.Get(newCoin.Id);
                 coin.Number = newCoin.Number;
@@ -140,11 +139,11 @@ namespace Web.Models
         /// <summary>
         /// Subtract the change from temporary list of coins.
         /// </summary>
-        /// <param name="tempCoinsList">Temporary list od coins</param>
+        /// <param name="newCoinsList">Temporary list od coins</param>
         /// <param name="numberOfCoinsForChange">List of change</param>
-        private static void UpdateTempCoinsList(List<CoinModel> tempCoinsList, Dictionary<int, int> numberOfCoinsForChange)
+        private static void UpdateTempCoinsList(List<CoinModel> newCoinsList, Dictionary<int, int> numberOfCoinsForChange)
         {
-            foreach (var newCoin in tempCoinsList)
+            foreach (var newCoin in newCoinsList)
             {
                 var key = Convert.ToInt32(newCoin.Name);
 
@@ -161,12 +160,25 @@ namespace Web.Models
         /// <param name="newCoinsList"></param>
         /// <param name="drinkModel"></param>
         /// <returns></returns>
-        private static Dictionary<int, int> DefineChange(int sum, List<int> coinsValueList, List<CoinModel> newCoinsList, DrinkModel drinkModel)
+        private static Dictionary<int, int> DefineChange(int sum, List<CoinModel> newCoinsList, DrinkModel drinkModel)
         {
             var numberOfCoinsForChange = new Dictionary<int, int>(); //Dictionary<coinId, coinNumber>
+            var change = sum - drinkModel.Cost;
 
-            DefineNumberOfCoinsForChange(
-                ref numberOfCoinsForChange, sum, coinsValueList, newCoinsList, drinkModel);
+            var stackListOfChange = new Stack<CoinModel>();
+
+            FillStackOfChange(stackListOfChange, newCoinsList, 0, 0, change);
+
+            foreach (var coin in stackListOfChange)
+            {
+                var key = Convert.ToInt32(coin.Name);
+
+                if (numberOfCoinsForChange.ContainsKey(key))
+                    numberOfCoinsForChange[key] += 1;
+                else
+                    numberOfCoinsForChange.Add(key, 1);
+            }
+
             return numberOfCoinsForChange;
         }
         
@@ -178,166 +190,94 @@ namespace Web.Models
         /// <param name="coinsValueList">List of coins value sorted in descending</param>
         /// <param name="newCoinsList">List of coins with coins from Client</param>
         private static void DefinePresenceOfChange(
-            List<DrinkModel> model, int sum, List<int> coinsValueList, List<CoinModel> newCoinsList)
+            List<DrinkModel> model, int sum, List<CoinModel> newCoinsList)
         {
             foreach (var drink in model)
             {
-                var coinsForChangeNumberDictionary = new Dictionary<int, int>(); //Dictionary<coinId, coinNumber>
+                var change = sum - drink.Cost;
 
-                var isHaveChange = DefineNumberOfCoinsForChange(
-                    ref coinsForChangeNumberDictionary, sum, coinsValueList, newCoinsList, drink);
+                if(change == 0)
+                    continue;
+                
+                var stackOfChange = new Stack<CoinModel>();
+                
+                var result = FillStackOfChange(stackOfChange, newCoinsList, 0, 0, change);
 
-                if (!isHaveChange)
-                {
+                if(result) continue;
+                
+                if (change != 0)
                     drink.ErrorMessage = "No change! Available only without change!";
-                    //drink.ErrorMessage = "No change!";
-                }
             }
         }
 
-        /// <summary>
-        /// Remove coins from dictionary if coinsList hasn't them 
-        /// </summary>
-        /// <param name="coinsForChangeNumberDictionary"></param>
-        /// <param name="sum"></param>
-        /// <param name="coinsValueList"></param>
-        /// <param name="newCoinsList"></param>
-        /// <param name="drinks"></param>
-        /// <returns></returns>
-        private static bool DefineNumberOfCoinsForChange(
-            ref Dictionary<int, int> coinsForChangeNumberDictionary, int sum, List<int> coinsValueList, List<CoinModel> newCoinsList, DrinkModel drinks)
+        private static bool FillStackOfChange(
+            Stack<CoinModel> stackOfChange, List<CoinModel> newCoinList, int coinIndex, int number, int change)
         {
-            var isHaveChange = false;
-            var change = sum - drinks.Cost;
+            var result = false;
 
-            FillDictionaryOfCoinsForChange(
-                coinsValueList, change, coinsForChangeNumberDictionary);
+            if (coinIndex >= newCoinList.Count || newCoinList[coinIndex].Number == 0)
+                return false;
 
-            if (coinsForChangeNumberDictionary.Count == 0)
-                return true;
+            var temp = stackOfChange.Sum(s => Convert.ToInt32(s.Name));
 
-            for (var i = 0; i < coinsValueList.Count; ++i)
+            if (number >= newCoinList[coinIndex].Number)
             {
-                if (coinsForChangeNumberDictionary.ContainsKey(coinsValueList[i]))
+                number = 0;
+                ++coinIndex;
+
+                if (coinIndex >= newCoinList.Count)
+                    return result;
+            }
+
+            for (int i = number; i < newCoinList[coinIndex].Number; ++i)
+            {
+                temp += Convert.ToInt32(newCoinList[coinIndex].Name);
+
+                if(temp < change)
                 {
-                    var coin = newCoinsList.FirstOrDefault(c =>
-                        c.Name.Equals(coinsValueList[i].ToString()) && c.Number > 0);
-
-                    var neededCoinsForChange = coinsForChangeNumberDictionary[coinsValueList[i]];
-
-                    if (coin != null)
+                    stackOfChange.Push(newCoinList[coinIndex]);
+                    result = FillStackOfChange(stackOfChange, newCoinList, coinIndex, i + 1, change);
+                    if (!result)
                     {
-                        var neededCoinsNumber = neededCoinsForChange - coin.Number;
-                        if (neededCoinsNumber > 0)
-                        {
-                            coinsForChangeNumberDictionary[coinsValueList[i]] = coin.Number;
+                        stackOfChange.Pop();
 
-                            FindOtherCoins(ref coinsForChangeNumberDictionary, ref isHaveChange,
-                                        coinsValueList, coinsValueList[i], neededCoinsNumber);
-                        }
-                        else
-                            isHaveChange = true;
+                        coinIndex++;
+                        if (coinIndex >= newCoinList.Count)
+                            break;
+
+                        i = -1;
+                        temp = stackOfChange.Sum(s => Convert.ToInt32(s.Name));
+                        continue;
                     }
-                    else
+                    break;
+                }
+                if (temp == change)
+                {
+                    stackOfChange.Push(newCoinList[coinIndex]);
+                    return true;
+                }
+
+                if (temp > change)
+                {
+                    if (++coinIndex >= newCoinList.Count)
+                        break;
+
+                    while (coinIndex < newCoinList.Count && newCoinList[coinIndex].Number == 0)
                     {
-                        var neededCoinsNumber = neededCoinsForChange;
-
-                        coinsForChangeNumberDictionary.Remove(coinsValueList[i]);
-
-                        FindOtherCoins(ref coinsForChangeNumberDictionary, ref isHaveChange,
-                                        coinsValueList, coinsValueList[i], neededCoinsNumber);
+                        ++coinIndex;
                     }
+
+                    if (coinIndex >= newCoinList.Count)
+                        break;
+
+                    temp = stackOfChange.Sum(s => Convert.ToInt32(s.Name));
+                    i = -1;
                 }
             }
-            if (coinsForChangeNumberDictionary.Count == 0)
-                isHaveChange = false;
 
-            return isHaveChange;
-        }
-
-        private static void FindOtherCoins(
-            ref Dictionary<int, int> coinsForChangeNumberDictionary, ref bool isHaveChange, 
-            List<int> coinsValueList, int coinValue, int neededCoinsNumber)
-        {
-            var newValue = coinValue / 2;
-            if(newValue == 0)
-                return;
-            
-            if (coinsValueList.Contains(newValue) && coinValue != 3)
-            {
-                if (coinsForChangeNumberDictionary.ContainsKey(newValue))
-                    coinsForChangeNumberDictionary[newValue] += 2 * neededCoinsNumber;
-                else
-                    coinsForChangeNumberDictionary.Add(newValue, 2 * neededCoinsNumber);
-
-                isHaveChange = true;
-            }
-            else
-            {
-                var newCoinsValueList = coinsValueList.Where(x => x < coinValue).OrderByDescending(c => c).ToList();
-
-                for (var j = 0; j < newCoinsValueList.Count; ++j)
-                {
-                    var nextCoin = newCoinsValueList[j];
-                    if (newValue / nextCoin > 0)
-                    {
-                        if (coinsForChangeNumberDictionary.ContainsKey(nextCoin))
-                        {
-                            coinsForChangeNumberDictionary[nextCoin] += neededCoinsNumber;
-                            newValue = newValue - nextCoin;
-
-                            if (coinsValueList.Contains(newValue))
-                                if (coinsForChangeNumberDictionary.ContainsKey(newValue))
-                                {
-                                    coinsForChangeNumberDictionary[newValue] += neededCoinsNumber;
-                                    isHaveChange = true;
-                                }
-                                else
-                                {
-                                    FindOtherCoins(ref coinsForChangeNumberDictionary, ref isHaveChange, 
-                                        coinsValueList, newValue, neededCoinsNumber);
-                                }
-                        }
-                    }
-
-                }
-            }
+            return result;
         }
         
-        /// <summary>
-        /// Create dictionary of needed coins for change
-        /// </summary>
-        /// <param name="coinsValueList">List of coins value sorted in descending</param>
-        /// <param name="change">Change value for Client</param>
-        /// <param name="coinsForChangeNumberDictionary">Empty dictionary of needed coins for change</param>
-        private static void FillDictionaryOfCoinsForChange(List<int> coinsValueList, int change,
-            IDictionary<int, int> coinsForChangeNumberDictionary)
-        {
-            foreach (var coin in coinsValueList)
-            {
-                var rest = change / coin;
-                if (rest > 0)
-                {
-                    coinsForChangeNumberDictionary.Add(coin, rest);
-                    // записываем необходимое кол-во определенных монет для сдачи
-                    change -= rest * coin;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Create list of coins value sorted in descending
-        /// </summary>
-        /// <param name="coins">List of coins from DB</param>
-        /// <returns>List of coins value sorted in descending</returns>
-        private static List<int> CreateCoinsValueList(List<Coin> coins)
-        {
-            var coinsValueList = new List<int>(coins.Count);
-            coinsValueList.AddRange(coins.Select(coin => Convert.ToInt32(coin.Name)));
-            coinsValueList.Sort((x, y) => y - x);
-            return coinsValueList;
-        }
-
         /// <summary>
         /// Calculate the sum of received money from Client
         /// </summary>
