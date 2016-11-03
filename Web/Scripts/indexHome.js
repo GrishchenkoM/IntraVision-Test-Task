@@ -13,6 +13,8 @@ function Update() {
                 displayCoins(data);
             },
             error: function (data) {
+                console.log(data);
+
                 var div = $("#Coins");
                 div.empty();
                 var substring = "Database is empty";
@@ -30,6 +32,8 @@ function Update() {
             displayDrinks(data);
         },
         error: function (data) {
+            console.log(data);
+
             var div = $("#Drinks");
             div.empty();
             var substring = "Database is empty";
@@ -65,11 +69,22 @@ function displayCoins(data) {
     $(".coin_btn").bind("click", TookCoin);
 }
 function displayDrinks(data) {
+    function createDiv(id, data) {
+        var div = document.createElement("div");
+        div.setAttribute("id", id);
+
+        if (data != undefined)
+            div.appendChild(document.createTextNode(data));
+
+        return div;
+    }
+
     var drinks = $("#Drinks");
     drinks.empty();
 
     for (var i = 0; i < data.length; ++i) {
         var drink = document.createElement("div");
+        drink.setAttribute("id", "drink_" + data[i].Id);
 
         var cellwidth;
         switch (5) {
@@ -90,22 +105,21 @@ function displayDrinks(data) {
             default:
                 cellwidth = "col-lg-2 col-md-3 col-sm-4 col-xs-12";
         }
-
-        drink.setAttribute("class", "product " + cellwidth);
-        drink.setAttribute("id", "drink_" + data[i].Id);
-        drink.appendChild(document.createTextNode(data[i].Name));
-        drink.appendChild(document.createElement("br"));
-        drink.appendChild(document.createTextNode(data[i].Cost));
-        drink.appendChild(document.createElement("br"));
+        drink.setAttribute("class", "product " + cellwidth + " cust");
         
-        if (data[i].ErrorMessage !== undefined) {
-            drink.appendChild(document.createTextNode(data[i].ErrorMessage));
-            drink.appendChild(document.createElement("br"));
-        }
+        var div = createDiv("nameOfDrink", data[i].Name);
+        div.className = "h4";
+        drink.appendChild(div);
+
+        div = createDiv("costOfDrink", data[i].Cost);
+        drink.appendChild(div);
+
+        div = createDiv("errorMessage", data[i].ErrorMessage);
+        div.className = "h4";
+        drink.appendChild(div);
 
         var btn = document.createElement("input");
-        btn.setAttribute("class", "drink_btn");
-        //btn.setAttribute("class", "drink_btn_disable");
+        btn.className = "drink_btn btn-danger";
         btn.setAttribute("disabled", "disabled");
         btn.setAttribute("id", "btn_" + data[i].Id);
         btn.setAttribute("type", "button");
@@ -169,11 +183,15 @@ function MakePurchase() {
 
 function EnableBuyButtons(data) {
     for (var i = 0; i < data.length; ++i) {
-        $("#btn_" + data[i].Id).css("display", "block");
-        $("#btn_" + data[i].Id).removeAttr("disabled");
-
-        if (data[i].ErrorMessage !== undefined && data[i].ErrorMessage !== null)
-            $("#drink_" + data[i].Id).append(document.createTextNode(data[i].ErrorMessage));
+        if (data[i].ErrorMessage !== undefined && data[i].ErrorMessage !== null) {
+            $("#drink_" + data[i].Id + " #errorMessage").text(data[i].ErrorMessage);
+        } else {
+            $("#btn_" + data[i].Id).css("display", "block");
+            $("#btn_" + data[i].Id).removeAttr("disabled");
+            $("#btn_" + data[i].Id).removeClass("drink_btn btn-danger");
+            $("#btn_" + data[i].Id).addClass("drink_btn btn-success");
+            $("#drink_" + data[i].Id + " #errorMessage").text("");
+        }
     }
 }
 function ResetCoins() {
@@ -181,6 +199,7 @@ function ResetCoins() {
     ResetCoinArray();
     $(".row input[type=button]").attr("disabled", "disabled");
     $("#sum_lable").text("");
+    Update();
 }
 
 function makeSumCounter() {

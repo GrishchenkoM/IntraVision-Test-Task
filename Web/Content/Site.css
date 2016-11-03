@@ -33,6 +33,7 @@ textarea {
 .coin input[type=button]{
     width: 50px;
     border-radius: 50px;
+    background-color: #dcb547;
 }
 
 .disable_btn{
@@ -61,6 +62,27 @@ textarea {
 
 thead {
    background: silver; 
+}
+
+#nameOfDrink {
+    font-weight: bold;
+    /*margin-top: 10px;
+    padding: 10px*/
+}
+
+#costOfDrink {
+    font-weight: bold;
+    padding: 2px 0;
+    color: blue;
+}
+
+#errorMessage {
+    color: red;
+}
+
+.cust {
+    margin: 10px 10px;
+    padding: 10px 10px;
 }
 
 .view-category .browse-view .row{
